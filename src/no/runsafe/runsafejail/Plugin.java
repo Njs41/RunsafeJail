@@ -7,6 +7,8 @@ public class Plugin extends RunsafePlugin
 	@Override
 	protected void PluginSetup()
 	{
-		addComponent(Component.class);
+		// TODO: Jail command
+		// TODO: Unjail command
+		// TODO: Location restriction
 	}
 }

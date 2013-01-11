@@ -1,10 +1,10 @@
 name: RunsafeJail
 main: no.runsafe.runsafejail.Plugin
 version: 1.0
-authors: []
+authors: [Kruithne]
 depend: []
-description:
+description: A plugin for jailing players in preset locations.
 commands:
-  something:
-    description:
-    aliases: []
+  jail:
+    description: Jails a player at a certain jail
+    usage: /jail <playername> [jail] <time>
