@@ -1,9 +1,10 @@
 package no.runsafe.runsafejail.database;
 
 import no.runsafe.framework.database.IDatabase;
-import no.runsafe.framework.database.ISchemaChanges;
+import no.runsafe.framework.database.Repository;
 import no.runsafe.framework.output.IOutput;
-import no.runsafe.runsafejail.Jail;
+import no.runsafe.framework.server.RunsafeLocation;
+import no.runsafe.framework.server.RunsafeWorld;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class JailsDatabase implements ISchemaChanges
+public class JailsDatabase extends Repository
 {
 	public JailsDatabase(IDatabase database, IOutput console)
 	{
@@ -45,27 +46,27 @@ public class JailsDatabase implements ISchemaChanges
 		return queries;
 	}
 
-	public HashMap<String, Jail> getJails()
+	public HashMap<String, RunsafeLocation> getJails()
 	{
 		PreparedStatement select = database.prepare("SELECT ID, x, y, z, world FROM jails");
-		HashMap<String, Jail> jails = new HashMap<String, Jail>();
+		HashMap<String, RunsafeLocation> jails = new HashMap<String, RunsafeLocation>();
 
 		try
 		{
 			ResultSet results = select.executeQuery();
 			while (results.next())
 			{
-				jails.put(results.getString("ID"), new Jail(
+				jails.put(results.getString("ID"), new RunsafeLocation(
+						new RunsafeWorld(results.getString("world")),
 						results.getDouble("x"),
 						results.getDouble("y"),
-						results.getDouble("z"),
-						results.getString("world")
+						results.getDouble("z")
 				));
 			}
 		}
 		catch (SQLException e)
 		{
-			console.write(e.getMessage());
+			this.console.write(e.getMessage());
 		}
 		return jails;
 	}
