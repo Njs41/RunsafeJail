@@ -14,7 +14,7 @@ public class JailCommand extends ExecutableCommand
 {
 	public JailCommand(JailHandler jailHandler)
 	{
-		super("jail", "Jail a player in the specified jail", "runsafe.jail.<jail>", "player", "jail", "time");
+		super("jail", "Jail a player in the specified jail", "runsafe.jail.<jail>", "player", "jail");
 		this.jailHandler = jailHandler;
 	}
 
