@@ -2,6 +2,7 @@ package no.runsafe.runsafejail.handlers;
 
 import no.runsafe.framework.configuration.IConfiguration;
 import no.runsafe.framework.event.IConfigurationChanged;
+import no.runsafe.framework.output.IOutput;
 import no.runsafe.framework.server.RunsafeLocation;
 import no.runsafe.framework.server.player.RunsafePlayer;
 import no.runsafe.framework.timer.CallbackTimer;
@@ -12,14 +13,16 @@ import no.runsafe.runsafejail.database.JailsDatabase;
 import org.joda.time.DateTime;
 
 import java.util.HashMap;
+import java.util.logging.Level;
 
 public class JailHandler implements IConfigurationChanged
 {
-	public JailHandler(JailsDatabase jailsDatabase, JailedPlayersDatabase jailedPlayersDatabase, IScheduler scheduler)
+	public JailHandler(JailsDatabase jailsDatabase, JailedPlayersDatabase jailedPlayersDatabase, IScheduler scheduler, IOutput console)
 	{
 		this.jailsDatabase = jailsDatabase;
 		this.jailedPlayersDatabase = jailedPlayersDatabase;
 		this.scheduler = scheduler;
+		this.console = console;
 	}
 
 	@Override
@@ -53,6 +56,7 @@ public class JailHandler implements IConfigurationChanged
 
 	private CallbackTimer createJailTimer(final String playerName)
 	{
+		this.console.outputDebugToConsole("Creating callback timer for %s", Level.FINE, playerName);
 		return new CallbackTimer(this.scheduler, new Runnable() {
 			@Override
 			public void run()
@@ -64,6 +68,7 @@ public class JailHandler implements IConfigurationChanged
 
 	public final void unjailPlayer(String playerName)
 	{
+		this.console.outputDebugToConsole("Unjailing player %s", Level.FINE, playerName);
 		this.jailedPlayers.remove(playerName);
 		this.jailedPlayersDatabase.removeJailedPlayer(playerName);
 	}
@@ -71,6 +76,7 @@ public class JailHandler implements IConfigurationChanged
 	public void jailPlayer(RunsafePlayer player, String jailName, DateTime end)
 	{
 		String playerName = player.getName();
+		this.console.outputDebugToConsole("Jailing player %s", Level.FINE, playerName);
 		player.teleport(this.getJailLocation(jailName));
 		this.jailedPlayers.remove(playerName);
 
@@ -84,4 +90,5 @@ public class JailHandler implements IConfigurationChanged
 	private JailsDatabase jailsDatabase;
 	private JailedPlayersDatabase jailedPlayersDatabase;
 	private IScheduler scheduler;
+	private IOutput console;
 }

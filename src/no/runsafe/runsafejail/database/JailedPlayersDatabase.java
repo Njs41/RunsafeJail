@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 public class JailedPlayersDatabase extends Repository
 {
@@ -50,6 +51,8 @@ public class JailedPlayersDatabase extends Repository
 		PreparedStatement select = database.prepare("SELECT player, jail, start, end FROM jailed_players");
 		HashMap<String, JailSentence> jailedPlayers = new HashMap<String, JailSentence>();
 
+		this.console.outputDebugToConsole("Pulling jailed players from the database", Level.FINE);
+
 		try
 		{
 			ResultSet results = select.executeQuery();
@@ -72,6 +75,7 @@ public class JailedPlayersDatabase extends Repository
 
 	public void addJailedPlayer(String playerName, String jailName, DateTime end)
 	{
+		this.console.outputDebugToConsole("Adding jailed player %s to the database", Level.FINE, playerName);
 		PreparedStatement update = database.prepare(
 				"INSERT IGNORE INTO jailed_players (player, jail, start, end)" +
 						"VALUES(?, ?, NOW(), ?)"
@@ -92,6 +96,7 @@ public class JailedPlayersDatabase extends Repository
 
 	public void removeJailedPlayer(String playerName)
 	{
+		this.console.outputDebugToConsole("Removing jailed player %s from the database", Level.FINE, playerName);
 		PreparedStatement delete = database.prepare("DELETE FROM jailed_players WHERE player = ?");
 
 		try
