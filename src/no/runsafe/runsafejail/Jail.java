@@ -2,6 +2,7 @@ package no.runsafe.runsafejail;
 
 import no.runsafe.framework.server.RunsafeLocation;
 import no.runsafe.framework.server.RunsafeWorld;
+import no.runsafe.framework.server.player.RunsafePlayer;
 
 public class Jail
 {
@@ -13,6 +14,11 @@ public class Jail
 	public RunsafeLocation getLocation()
 	{
 		return this.location;
+	}
+
+	public void teleportPlayerHere(RunsafePlayer player)
+	{
+		player.teleport(this.location);
 	}
 
 	private RunsafeLocation location;

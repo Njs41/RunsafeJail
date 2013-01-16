@@ -7,7 +7,5 @@ description: A plugin for jailing players in preset locations.
 commands:
   jail:
     description: Jails a player at a certain jail
-    usage: /jail <player> [jail] <time>
   unjail:
     description: Unjails a player, returning them to their previous location.
-    usage: /unjail <player>

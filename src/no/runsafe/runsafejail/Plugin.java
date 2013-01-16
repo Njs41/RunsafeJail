@@ -13,6 +13,5 @@ public class Plugin extends RunsafePlugin
 
 		// TODO: in-game jail creator
 		// TODO: Handle players who have no previous location?
-		// I LIKE TRAINS
 	}
 }
