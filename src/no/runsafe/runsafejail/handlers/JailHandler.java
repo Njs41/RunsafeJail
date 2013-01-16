@@ -10,6 +10,11 @@ import java.util.Set;
 
 public class JailHandler implements IConfigurationChanged
 {
+	public JailHandler()
+	{
+		this.jails = new HashMap<String, Jail>();
+	}
+
 	@Override
 	public void OnConfigurationChanged(IConfiguration configuration)
 	{
