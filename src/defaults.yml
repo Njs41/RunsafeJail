@@ -1,8 +1,7 @@
-RunsafeJail:
-  tether: 20
-  jails:
-    example:
-      world: world
-      x: 100
-      y: 64
-      z: 100
+tether: 20
+jails:
+example:
+  world: world
+  x: 100
+  y: 64
+  z: 100
