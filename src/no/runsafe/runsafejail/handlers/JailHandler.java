@@ -11,9 +11,10 @@ import java.util.Set;
 
 public class JailHandler implements IConfigurationChanged
 {
-	public JailHandler()
+	public JailHandler(IOutput console)
 	{
 		this.jails = new HashMap<String, Jail>();
+		this.console = console;
 	}
 
 	@Override
@@ -31,6 +32,7 @@ public class JailHandler implements IConfigurationChanged
 					jailInfo.getDouble("z"),
 					jailInfo.getString("world")
 			));
+			this.console.write("Registering jail: " + jail);
 		}
 	}
 
@@ -40,4 +42,5 @@ public class JailHandler implements IConfigurationChanged
 	}
 
 	private HashMap<String, Jail> jails;
+	private IOutput console;
 }
