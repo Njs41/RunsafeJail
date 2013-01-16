@@ -97,7 +97,7 @@ public class JailedPlayersDatabase extends Repository
 		try
 		{
 			delete.setString(1, playerName);
-			delete.executeQuery();
+			delete.executeUpdate();
 		}
 		catch (SQLException e)
 		{
