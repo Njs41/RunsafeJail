@@ -11,6 +11,7 @@ import no.runsafe.runsafejail.JailSentence;
 import no.runsafe.runsafejail.database.JailedPlayersDatabase;
 import no.runsafe.runsafejail.database.JailsDatabase;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -34,7 +35,7 @@ public class JailHandler implements IConfigurationChanged
 		for (String key : this.jailedPlayers.keySet())
 		{
 			JailSentence jailSentence = this.jailedPlayers.get(key);
-			jailSentence.setSentenceTimer(this.createJailTimer(key));
+			jailSentence.setSentenceTimer(this.createJailTimer(key, jailSentence.getEndTime()));
 			this.jailedPlayers.put(key, jailSentence);
 		}
 	}
@@ -54,7 +55,7 @@ public class JailHandler implements IConfigurationChanged
 		return this.jails.containsKey(jailName);
 	}
 
-	private CallbackTimer createJailTimer(final String playerName)
+	private CallbackTimer createJailTimer(final String playerName, DateTime end)
 	{
 		this.console.outputDebugToConsole("Creating callback timer for %s", Level.FINE, playerName);
 		return new CallbackTimer(this.scheduler, new Runnable() {
@@ -63,7 +64,7 @@ public class JailHandler implements IConfigurationChanged
 			{
 				unjailPlayer(playerName);
 			}
-		}, 10L, 0L, true);
+		}, DateTime.now().minus(end.getMillis()).getMillis(), 0L, true);
 	}
 
 	public final void unjailPlayer(String playerName)
@@ -81,7 +82,7 @@ public class JailHandler implements IConfigurationChanged
 		this.jailedPlayers.remove(playerName);
 
 		JailSentence jailSentence = new JailSentence(playerName, jailName, end);
-		jailSentence.setSentenceTimer(this.createJailTimer(playerName));
+		jailSentence.setSentenceTimer(this.createJailTimer(playerName, end));
 		this.jailedPlayers.put(playerName, jailSentence);
 	}
 
