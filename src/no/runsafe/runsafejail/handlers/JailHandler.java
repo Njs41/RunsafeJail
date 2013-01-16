@@ -2,6 +2,7 @@ package no.runsafe.runsafejail.handlers;
 
 import no.runsafe.framework.configuration.IConfiguration;
 import no.runsafe.framework.event.IConfigurationChanged;
+import no.runsafe.framework.output.IOutput;
 import no.runsafe.runsafejail.Jail;
 import org.bukkit.configuration.ConfigurationSection;
 
