@@ -1,6 +1,8 @@
 package no.runsafe.runsafejail;
 
 import no.runsafe.framework.RunsafePlugin;
+import no.runsafe.runsafejail.commands.JailCommand;
+import no.runsafe.runsafejail.handlers.JailHandler;
 
 public class Plugin extends RunsafePlugin
 {
@@ -13,5 +15,11 @@ public class Plugin extends RunsafePlugin
 
 		// TODO: in-game jail creator
 		// TODO: Handle players who have no previous location?
+
+		// Commands
+		this.addComponent(JailCommand.class);
+
+		// Handlers
+		this.addComponent(JailHandler.class);
 	}
 }
