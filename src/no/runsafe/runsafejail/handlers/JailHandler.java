@@ -64,7 +64,7 @@ public class JailHandler implements IConfigurationChanged
 			{
 				unjailPlayer(playerName);
 			}
-		}, DateTime.now().minus(end.getMillis()).getMillis(), 0L, true);
+		}, DateTime.now().minus(end.getMillis()).getMillis(), 0, true);
 	}
 
 	public final void unjailPlayer(String playerName)
