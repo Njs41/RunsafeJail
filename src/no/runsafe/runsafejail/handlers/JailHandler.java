@@ -15,6 +15,7 @@ import no.runsafe.runsafejail.database.JailedPlayersDatabase;
 import no.runsafe.runsafejail.database.JailsDatabase;
 import no.runsafe.runsafejail.exceptions.JailException;
 import no.runsafe.runsafejail.exceptions.JailPlayerException;
+import org.bukkit.entity.LivingEntity;
 import org.joda.time.DateTime;
 
 import java.util.HashMap;
@@ -122,7 +123,7 @@ public class JailHandler implements IConfigurationChanged
 				{
 					long remainingTime = DateTime.now().minus(end.getMillis()).getMillis();
 
-					JailedPlayer jailedPlayer = (JailedPlayer) player;
+					JailedPlayer jailedPlayer = new JailedPlayer(player.getRawPlayer());
 					if (!jailedPlayer.hasReturnLocation()) jailedPlayer.setReturnLocation();
 
 					JailSentence jailSentence = new JailSentence(jailName, end, this.jailSentenceFactory.create(
