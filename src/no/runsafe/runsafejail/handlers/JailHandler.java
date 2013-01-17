@@ -15,6 +15,7 @@ import no.runsafe.runsafejail.database.JailedPlayersDatabase;
 import no.runsafe.runsafejail.database.JailsDatabase;
 import no.runsafe.runsafejail.exceptions.JailException;
 import no.runsafe.runsafejail.exceptions.JailPlayerException;
+import no.runsafe.runsafejail.workers.TetherWorker;
 import org.bukkit.entity.LivingEntity;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -25,13 +26,15 @@ import java.util.logging.Level;
 
 public class JailHandler implements IConfigurationChanged
 {
-	public JailHandler(JailsDatabase jailsDatabase, JailedPlayersDatabase jailedPlayersDatabase, IOutput console, JailSentenceFactory jailSentenceFactory)
+	public JailHandler(JailsDatabase jailsDatabase, JailedPlayersDatabase jailedPlayersDatabase, IOutput console, JailSentenceFactory jailSentenceFactory, TetherWorker tetherWorker)
 	{
 		this.jailsDatabase = jailsDatabase;
 		this.console = console;
 		this.jailedPlayersDatabase = jailedPlayersDatabase;
 		this.jailSentenceFactory = jailSentenceFactory;
 		this.jailSentenceFactory.setJailHandler(this);
+		this.tetherWorker = tetherWorker;
+		this.tetherWorker.setJailHandler(this);
 	}
 
 	@Override
@@ -98,12 +101,22 @@ public class JailHandler implements IConfigurationChanged
 		return this.jailedPlayers.containsKey(playerName);
 	}
 
-	private String getPlayerJail(String playerName) throws JailException
+	public String getPlayerJail(String playerName)
 	{
 		if (this.playerIsJailed(playerName))
 			return this.jailedPlayers.get(playerName).getJailName();
 
-		throw new JailException("That player is not in jail");
+		return null;
+	}
+
+	public RunsafeLocation getPlayerJailLocation(String playerName)
+	{
+		String jailName = this.getPlayerJail(playerName);
+
+		if (jailName != null)
+			return this.getJailLocation(jailName);
+
+		return null;
 	}
 
 	private void cancelAllJailTimers()
@@ -136,18 +149,11 @@ public class JailHandler implements IConfigurationChanged
 
 					this.jailedPlayers.put(playerName, jailSentence);
 					this.console.outputDebugToConsole(
-							"Jailing player %s for %sMS", Level.INFO, playerName, remainingTime
+							"Jailing player %s for %s ticks", Level.INFO, playerName, remainingTime
 					);
 					this.jailedPlayersDatabase.addJailedPlayer(jailedPlayer, jailSentence);
-
-					try
-					{
-						jailedPlayer.teleport(this.getJailLocation(jailName));
-					}
-					catch (JailException e)
-					{
-						throw new JailPlayerException("The specified jail does not exist.");
-					}
+					jailedPlayer.teleport(this.getJailLocation(jailName));
+					this.tetherWorker.Push(jailedPlayer.getName(), null);
 				}
 				else
 				{
@@ -188,39 +194,17 @@ public class JailHandler implements IConfigurationChanged
 		}
 	}
 
-	public void checkTether(RunsafePlayer player)
-	{
-		try
-		{
-			RunsafeLocation jailLocation = this.getJailLocation(this.getPlayerJail(player.getName()));
-			if (jailLocation.distance(player.getLocation()) > this.jailTether)
-			{
-				player.teleport(jailLocation);
-				this.console.outputDebugToConsole(
-						"%s was outside jail tether radius. Teleporting back.", Level.FINE, player.getName()
-				);
-			}
-		}
-		catch (JailException e)
-		{
-			this.console.outputDebugToConsole("User jailed in non-existent jail, cancelling sentence.", Level.WARNING);
-			try
-			{
-				this.unjailPlayer(player);
-			}
-			catch (JailPlayerException je)
-			{
-				this.console.outputDebugToConsole("Failed to un-jail player, they were not jailed.", Level.WARNING);
-			}
-		}
-	}
-
-	public RunsafeLocation getJailLocation(String jailName) throws JailException
+	public RunsafeLocation getJailLocation(String jailName)
 	{
 		if (this.jailExists(jailName))
 			return this.jails.get(jailName);
-		else
-			throw new JailException("The specified jail does not exist.");
+
+		return null;
+	}
+
+	public int getJailTether()
+	{
+		return this.jailTether;
 	}
 
 	private HashMap<String, RunsafeLocation> jails;
@@ -233,4 +217,5 @@ public class JailHandler implements IConfigurationChanged
 	private IOutput console;
 
 	private int jailTether = 20;
+	private TetherWorker tetherWorker;
 }
