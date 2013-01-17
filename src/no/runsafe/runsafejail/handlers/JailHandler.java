@@ -29,6 +29,7 @@ public class JailHandler implements IConfigurationChanged
 		this.console = console;
 		this.jailedPlayersDatabase = jailedPlayersDatabase;
 		this.jailSentenceFactory = jailSentenceFactory;
+		this.jailSentenceFactory.setJailHandler(this);
 	}
 
 	@Override

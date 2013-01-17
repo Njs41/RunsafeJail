@@ -9,10 +9,14 @@ import java.util.logging.Level;
 
 public class JailSentenceFactory extends TimerFactory<JailedPlayer>
 {
-	public JailSentenceFactory(IScheduler scheduler, IOutput console, JailHandler jailHandler)
+	public JailSentenceFactory(IScheduler scheduler, IOutput console)
 	{
 		super(scheduler);
 		this.console = console;
+	}
+
+	public void setJailHandler(JailHandler jailHandler)
+	{
 		this.jailHandler = jailHandler;
 	}
 
