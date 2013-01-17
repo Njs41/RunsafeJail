@@ -42,7 +42,7 @@ public class JailedPlayersDatabase extends Repository
 					"`returnY` DOUBLE NOT NULL," +
 					"`returnZ` DOUBLE NOT NULL," +
 					"`returnWorld` VARCHAR(50) NULL," +
-					"PRIMARY KEY (`player`)" +
+					"PRIMARY KEY (`playerName`)" +
 			")"
 		);
 		queries.put(1, sql);
