@@ -83,7 +83,7 @@ public class JailHandler implements IConfigurationChanged
 				}
 			}
 		}
-		this.console.outputDebugToConsole("Loaded %s jail sentences from the database.", Level.INFO, this.jailedPlayers);
+		this.console.outputDebugToConsole("Loaded %s jail sentences from the database.", Level.INFO, this.jailedPlayers.size());
 	}
 
 	private boolean jailExists(String jailName)
