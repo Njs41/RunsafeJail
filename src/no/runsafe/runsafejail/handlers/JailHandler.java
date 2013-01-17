@@ -139,6 +139,15 @@ public class JailHandler implements IConfigurationChanged
 							"Jailing player %s for %sMS", Level.INFO, playerName, remainingTime
 					);
 					this.jailedPlayersDatabase.addJailedPlayer(jailedPlayer, jailSentence);
+
+					try
+					{
+						jailedPlayer.teleport(this.getJailLocation(jailName));
+					}
+					catch (JailException e)
+					{
+						throw new JailPlayerException("The specified jail does not exist.");
+					}
 				}
 				else
 				{
