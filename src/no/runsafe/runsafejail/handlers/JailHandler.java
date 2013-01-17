@@ -121,7 +121,7 @@ public class JailHandler implements IConfigurationChanged
 				String playerName = player.getName();
 				if (!this.playerIsJailed(playerName))
 				{
-					long remainingTime = DateTime.now().minus(end.getMillis()).getMillis();
+					long remainingTime = end.minus(DateTime.now().getMillis()).getMillis();
 
 					JailedPlayer jailedPlayer = new JailedPlayer(player.getRawPlayer());
 					if (!jailedPlayer.hasReturnLocation()) jailedPlayer.setReturnLocation();
