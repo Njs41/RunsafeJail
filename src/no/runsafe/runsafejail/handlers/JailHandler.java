@@ -188,15 +188,30 @@ public class JailHandler implements IConfigurationChanged
 		}
 	}
 
-	public void checkTether(RunsafePlayer player) throws JailException
+	public void checkTether(RunsafePlayer player)
 	{
-		RunsafeLocation jailLocation = this.getJailLocation(this.getPlayerJail(player.getName()));
-		if (jailLocation.distance(player.getLocation()) > this.jailTether)
+		try
 		{
-			player.teleport(jailLocation);
-			this.console.outputDebugToConsole(
-					"%s was outside jail tether radius. Teleporting back.", Level.FINE, player.getName()
-			);
+			RunsafeLocation jailLocation = this.getJailLocation(this.getPlayerJail(player.getName()));
+			if (jailLocation.distance(player.getLocation()) > this.jailTether)
+			{
+				player.teleport(jailLocation);
+				this.console.outputDebugToConsole(
+						"%s was outside jail tether radius. Teleporting back.", Level.FINE, player.getName()
+				);
+			}
+		}
+		catch (JailException e)
+		{
+			this.console.outputDebugToConsole("User jailed in non-existent jail, cancelling sentence.", Level.WARNING);
+			try
+			{
+				this.unjailPlayer(player);
+			}
+			catch (JailPlayerException je)
+			{
+				this.console.outputDebugToConsole("Failed to un-jail player, they were not jailed.", Level.WARNING);
+			}
 		}
 	}
 
