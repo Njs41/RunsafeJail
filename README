@@ -3,3 +3,5 @@ Permissions:
 	runsafe.jail.JAILNAME - Allows you to jail a player in X jail.
 	runsafe.jail.unjail - Allows you to unjail a player.
 	runsafe.jail.immune - Makes you exempt from being jailed.
+
+Science
