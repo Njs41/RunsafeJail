@@ -4,6 +4,7 @@ import no.runsafe.framework.command.ExecutableCommand;
 import no.runsafe.framework.server.ICommandExecutor;
 import no.runsafe.framework.server.RunsafeServer;
 import no.runsafe.framework.server.player.RunsafePlayer;
+import no.runsafe.runsafejail.exceptions.JailPlayerException;
 import no.runsafe.runsafejail.handlers.JailHandler;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
@@ -32,27 +33,17 @@ public class JailCommand extends ExecutableCommand
 	public String OnExecute(ICommandExecutor executor, HashMap<String, String> parameters, String[] arguments)
 	{
 		RunsafePlayer target = RunsafeServer.Instance.getPlayer(parameters.get("player"));
-		if (target != null)
+
+		try
 		{
-			if (target.isOnline())
-			{
-				String jail = parameters.get("jail");
-				if (this.jailHandler.jailExists(jail))
-				{
-					Period duration = this.timeParser.parsePeriod(parameters.get("time"));
-					this.jailHandler.jailPlayer(target, jail, DateTime.now().plus(duration));
-				}
-				else
-				{
-					return "&c" + parameters.get("jail") + " is not a valid jail.";
-				}
-			}
-			else
-			{
-				return "&c" + target.getName() + " is not online.";
-			}
+			Period duration = this.timeParser.parsePeriod(parameters.get("time"));
+			this.jailHandler.jailPlayer(target, parameters.get("jail"), DateTime.now().plus(duration));
+			return String.format("%s has been jailed for %s", parameters.get("player"), parameters.get("time"));
 		}
-		return "&cThe specified player does not exist.";
+		catch (JailPlayerException e)
+		{
+			return String.format("&c%s", e.getMessage());
+		}
 	}
 
 	@Override
@@ -61,6 +52,6 @@ public class JailCommand extends ExecutableCommand
 		return null;
 	}
 
-	private final PeriodFormatter timeParser;
+	private PeriodFormatter timeParser;
 	private JailHandler jailHandler;
 }

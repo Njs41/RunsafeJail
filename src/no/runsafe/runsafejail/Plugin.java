@@ -1,29 +1,30 @@
 package no.runsafe.runsafejail;
 
 import no.runsafe.framework.RunsafeConfigurablePlugin;
-import no.runsafe.framework.RunsafePlugin;
 import no.runsafe.runsafejail.commands.JailCommand;
 import no.runsafe.runsafejail.database.JailedPlayersDatabase;
 import no.runsafe.runsafejail.database.JailsDatabase;
 import no.runsafe.runsafejail.handlers.JailHandler;
+import no.runsafe.runsafejail.handlers.JailSentenceFactory;
 
 public class Plugin extends RunsafeConfigurablePlugin
 {
 	@Override
 	protected void PluginSetup()
 	{
-		// TODO: Jail command
-		// TODO: Unjail command
-		// TODO: Location restriction
-
+		// TODO: Un-jail command
 		// TODO: in-game jail creator
-		// TODO: Handle players who have no previous location?
+		// TODO: Permission checking.
+		// TODO: Exempt check
 
 		// Commands
 		this.addComponent(JailCommand.class);
 
 		// Handlers
 		this.addComponent(JailHandler.class);
+
+		// Factories
+		this.addComponent(JailSentenceFactory.class);
 
 		// Database
 		this.addComponent(JailsDatabase.class);
