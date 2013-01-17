@@ -17,6 +17,7 @@ import no.runsafe.runsafejail.exceptions.JailException;
 import no.runsafe.runsafejail.exceptions.JailPlayerException;
 import org.bukkit.entity.LivingEntity;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 import java.util.HashMap;
 import java.util.List;
@@ -121,7 +122,8 @@ public class JailHandler implements IConfigurationChanged
 				String playerName = player.getName();
 				if (!this.playerIsJailed(playerName))
 				{
-					long remainingTime = end.minus(DateTime.now().getMillis()).getMillis();
+					Duration duration = new Duration(DateTime.now(), end);
+					long remainingTime = duration.getStandardSeconds() * 20;
 
 					JailedPlayer jailedPlayer = new JailedPlayer(player.getRawPlayer());
 					if (!jailedPlayer.hasReturnLocation()) jailedPlayer.setReturnLocation();
@@ -136,6 +138,7 @@ public class JailHandler implements IConfigurationChanged
 					this.console.outputDebugToConsole(
 							"Jailing player %s for %sMS", Level.INFO, playerName, remainingTime
 					);
+					this.jailedPlayersDatabase.addJailedPlayer(jailedPlayer, jailSentence);
 				}
 				else
 				{
