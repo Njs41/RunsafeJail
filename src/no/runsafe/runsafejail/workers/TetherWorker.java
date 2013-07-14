@@ -1,15 +1,15 @@
 package no.runsafe.runsafejail.workers;
 
-import no.runsafe.framework.event.player.IPlayerLoginEvent;
-import no.runsafe.framework.event.player.IPlayerMove;
-import no.runsafe.framework.event.player.IPlayerTeleportEvent;
-import no.runsafe.framework.server.RunsafeLocation;
-import no.runsafe.framework.server.RunsafeServer;
-import no.runsafe.framework.server.event.player.RunsafePlayerLoginEvent;
-import no.runsafe.framework.server.event.player.RunsafePlayerTeleportEvent;
-import no.runsafe.framework.server.player.RunsafePlayer;
+import no.runsafe.framework.api.IScheduler;
+import no.runsafe.framework.api.event.player.IPlayerLoginEvent;
+import no.runsafe.framework.api.event.player.IPlayerMove;
+import no.runsafe.framework.api.event.player.IPlayerTeleportEvent;
+import no.runsafe.framework.minecraft.RunsafeLocation;
+import no.runsafe.framework.minecraft.RunsafeServer;
+import no.runsafe.framework.minecraft.event.player.RunsafePlayerLoginEvent;
+import no.runsafe.framework.minecraft.event.player.RunsafePlayerTeleportEvent;
+import no.runsafe.framework.minecraft.player.RunsafePlayer;
 import no.runsafe.framework.timer.ForegroundWorker;
-import no.runsafe.framework.timer.IScheduler;
 import no.runsafe.runsafejail.handlers.JailHandler;
 
 public class TetherWorker extends ForegroundWorker<String, Object> implements IPlayerMove, IPlayerTeleportEvent, IPlayerLoginEvent

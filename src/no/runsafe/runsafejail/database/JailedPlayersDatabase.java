@@ -1,24 +1,23 @@
 package no.runsafe.runsafejail.database;
 
-import no.runsafe.framework.database.IDatabase;
-import no.runsafe.framework.database.Repository;
-import no.runsafe.framework.output.IOutput;
-import no.runsafe.framework.server.RunsafeLocation;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import no.runsafe.framework.api.database.IDatabase;
+import no.runsafe.framework.api.database.IRow;
+import no.runsafe.framework.api.database.Repository;
+import no.runsafe.framework.minecraft.RunsafeLocation;
 import no.runsafe.runsafejail.objects.JailSentence;
 import no.runsafe.runsafejail.objects.JailedPlayer;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class JailedPlayersDatabase extends Repository
 {
-	public JailedPlayersDatabase(IDatabase database, IOutput console)
+	public JailedPlayersDatabase(IDatabase database)
 	{
-		this.console = console;
 		this.database = database;
 	}
 
@@ -35,15 +34,15 @@ public class JailedPlayersDatabase extends Repository
 		ArrayList<String> sql = new ArrayList<String>();
 		sql.add(
 			"CREATE TABLE `jailed_players` (" +
-					"`playerName` VARCHAR(20) NOT NULL," +
-					"`jailName` VARCHAR(30) NOT NULL," +
-					"`sentenceEnd` DATETIME NOT NULL," +
-					"`returnX` DOUBLE NOT NULL," +
-					"`returnY` DOUBLE NOT NULL," +
-					"`returnZ` DOUBLE NOT NULL," +
-					"`returnWorld` VARCHAR(50) NULL," +
-					"PRIMARY KEY (`playerName`)" +
-			")"
+				"`playerName` VARCHAR(20) NOT NULL," +
+				"`jailName` VARCHAR(30) NOT NULL," +
+				"`sentenceEnd` DATETIME NOT NULL," +
+				"`returnX` DOUBLE NOT NULL," +
+				"`returnY` DOUBLE NOT NULL," +
+				"`returnZ` DOUBLE NOT NULL," +
+				"`returnWorld` VARCHAR(50) NULL," +
+				"PRIMARY KEY (`playerName`)" +
+				")"
 		);
 		queries.put(1, sql);
 		return queries;
@@ -51,84 +50,58 @@ public class JailedPlayersDatabase extends Repository
 
 	public List<JailedPlayerDatabaseObject> getJailedPlayers()
 	{
-		ArrayList<JailedPlayerDatabaseObject> jailedPlayers = new ArrayList<JailedPlayerDatabaseObject>();
-		PreparedStatement select = this.database.prepare(
+		return Lists.transform(
+			this.database.Query(
 				"SELECT playerName, jailName, sentenceEnd, returnX, returnY, returnZ, returnWorld FROM jailed_players"
-		);
-
-		try
-		{
-			ResultSet player = select.executeQuery();
-			while (player.next())
+			),
+			new Function<IRow, JailedPlayerDatabaseObject>()
 			{
-				JailedPlayerDatabaseObject jailedPlayer = new JailedPlayerDatabaseObject();
-				jailedPlayer.setPlayerName(player.getString("playerName"));
-				jailedPlayer.setJailName(player.getString("jailName"));
-				jailedPlayer.setSentenceEnd(convert(player.getTimestamp("sentenceEnd")));
-				jailedPlayer.setReturnX(player.getDouble("returnX"));
-				jailedPlayer.setReturnY(player.getDouble("returnY"));
-				jailedPlayer.setReturnZ(player.getDouble("returnZ"));
-				jailedPlayer.setReturnWorld(player.getString("returnWorld"));
-
-				jailedPlayers.add(jailedPlayer);
+				@Override
+				public JailedPlayerDatabaseObject apply(@Nullable IRow sentence)
+				{
+					assert sentence != null;
+					JailedPlayerDatabaseObject jailedPlayer = new JailedPlayerDatabaseObject();
+					jailedPlayer.setPlayerName(sentence.String("playerName"));
+					jailedPlayer.setJailName(sentence.String("jailName"));
+					jailedPlayer.setSentenceEnd(sentence.DateTime("sentenceEnd"));
+					jailedPlayer.setReturnX(sentence.Double("returnX"));
+					jailedPlayer.setReturnY(sentence.Double("returnY"));
+					jailedPlayer.setReturnZ(sentence.Double("returnZ"));
+					jailedPlayer.setReturnWorld(sentence.String("returnWorld"));
+					return jailedPlayer;
+				}
 			}
-		}
-		catch (SQLException e)
-		{
-			this.console.write(e.getMessage());
-		}
-
-		return jailedPlayers;
+		);
 	}
 
 	public void addJailedPlayer(JailedPlayer player, JailSentence jailSentence)
 	{
-		PreparedStatement insert = database.prepare(
-				"INSERT INTO jailed_players (" +
-						"playerName," +
-						"jailName," +
-						"sentenceEnd," +
-						"returnX," +
-						"returnY," +
-						"returnZ," +
-						"returnWorld" +
-				") VALUES(?, ?, ?, ?, ?, ?, ?)"
+		RunsafeLocation returnLocation = player.getReturnLocation();
+		database.Execute(
+			"INSERT INTO jailed_players (" +
+				"playerName," +
+				"jailName," +
+				"sentenceEnd," +
+				"returnX," +
+				"returnY," +
+				"returnZ," +
+				"returnWorld" +
+				") VALUES(?, ?, ?, ?, ?, ?, ?)",
+			player.getName(),
+			jailSentence.getJailName(),
+			jailSentence.getEndSentence(),
+			returnLocation.getX(),
+			returnLocation.getY(),
+			returnLocation.getZ(),
+			returnLocation.getWorld()
+
 		);
-
-		try
-		{
-			RunsafeLocation returnLocation = player.getReturnLocation();
-
-			insert.setString(1, player.getName());
-			insert.setString(2, jailSentence.getJailName());
-			insert.setTimestamp(3, convert(jailSentence.getEndSentence()));
-			insert.setDouble(4, returnLocation.getX());
-			insert.setDouble(5, returnLocation.getY());
-			insert.setDouble(6, returnLocation.getZ());
-			insert.setString(7, returnLocation.getWorld().getName());
-			insert.executeUpdate();
-		}
-		catch (SQLException e)
-		{
-			this.console.write(e.getMessage());
-		}
 	}
 
 	public void removeJailedPlayer(String playerName)
 	{
-		PreparedStatement delete = database.prepare("DELETE FROM jailed_players WHERE playerName = ?");
-
-		try
-		{
-			delete.setString(1, playerName);
-			delete.executeUpdate();
-		}
-		catch (SQLException e)
-		{
-			this.console.write(e.getMessage());
-		}
+		database.Execute("DELETE FROM jailed_players WHERE playerName = ?", playerName);
 	}
 
 	private IDatabase database;
-	private IOutput console;
 }

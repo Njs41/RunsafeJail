@@ -1,6 +1,6 @@
 package no.runsafe.runsafejail.objects;
 
-import no.runsafe.framework.timer.ITimer;
+import no.runsafe.framework.api.ITimer;
 import org.joda.time.DateTime;
 
 public class JailSentence

@@ -1,9 +1,9 @@
 package no.runsafe.runsafejail.commands;
 
-import no.runsafe.framework.command.ExecutableCommand;
-import no.runsafe.framework.server.ICommandExecutor;
-import no.runsafe.framework.server.RunsafeServer;
-import no.runsafe.framework.server.player.RunsafePlayer;
+import no.runsafe.framework.api.command.ExecutableCommand;
+import no.runsafe.framework.api.command.ICommandExecutor;
+import no.runsafe.framework.minecraft.RunsafeServer;
+import no.runsafe.framework.minecraft.player.RunsafePlayer;
 import no.runsafe.runsafejail.exceptions.JailPlayerException;
 import no.runsafe.runsafejail.handlers.JailHandler;
 import org.joda.time.DateTime;
@@ -20,13 +20,13 @@ public class JailCommand extends ExecutableCommand
 		super("jail", "Jail a player in the specified jail", "runsafe.jail.<jail>", "player", "jail", "time");
 		this.jailHandler = jailHandler;
 		this.timeParser = new PeriodFormatterBuilder()
-				.printZeroRarelyFirst().appendYears().appendSuffix("y", "years")
-				.printZeroRarelyFirst().appendWeeks().appendSuffix("w", "weeks")
-				.printZeroRarelyFirst().appendDays().appendSuffix("d", "days")
-				.printZeroRarelyFirst().appendHours().appendSuffix("h", "hours")
-				.printZeroRarelyFirst().appendMinutes().appendSuffix("m", "minutes")
-				.printZeroRarelyFirst().appendSeconds().appendSuffix("s", "seconds")
-				.toFormatter();
+			.printZeroRarelyFirst().appendYears().appendSuffix("y", "years")
+			.printZeroRarelyFirst().appendWeeks().appendSuffix("w", "weeks")
+			.printZeroRarelyFirst().appendDays().appendSuffix("d", "days")
+			.printZeroRarelyFirst().appendHours().appendSuffix("h", "hours")
+			.printZeroRarelyFirst().appendMinutes().appendSuffix("m", "minutes")
+			.printZeroRarelyFirst().appendSeconds().appendSuffix("s", "seconds")
+			.toFormatter();
 	}
 
 	@Override

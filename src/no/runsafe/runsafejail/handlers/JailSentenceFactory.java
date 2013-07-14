@@ -1,7 +1,7 @@
 package no.runsafe.runsafejail.handlers;
 
-import no.runsafe.framework.output.IOutput;
-import no.runsafe.framework.timer.IScheduler;
+import no.runsafe.framework.api.IOutput;
+import no.runsafe.framework.api.IScheduler;
 import no.runsafe.framework.timer.TimerFactory;
 import no.runsafe.runsafejail.objects.JailedPlayer;
 
@@ -25,9 +25,9 @@ public class JailSentenceFactory extends TimerFactory<JailedPlayer>
 	{
 		state.returnFromJail();
 		this.console.outputDebugToConsole(
-				"Jail timer for %s has been killed, triggering sentence removal.",
-				Level.FINE,
-				state.getName()
+			"Jail timer for %s has been killed, triggering sentence removal.",
+			Level.FINE,
+			state.getName()
 		);
 		this.jailHandler.removeJailSentence(state.getName());
 	}

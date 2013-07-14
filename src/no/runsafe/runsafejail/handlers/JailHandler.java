@@ -1,22 +1,20 @@
 package no.runsafe.runsafejail.handlers;
 
-import no.runsafe.framework.configuration.IConfiguration;
-import no.runsafe.framework.event.IConfigurationChanged;
-import no.runsafe.framework.output.IOutput;
-import no.runsafe.framework.server.RunsafeLocation;
-import no.runsafe.framework.server.RunsafeServer;
-import no.runsafe.framework.server.RunsafeWorld;
-import no.runsafe.framework.server.player.RunsafePlayer;
-import no.runsafe.framework.timer.ITimer;
-import no.runsafe.runsafejail.objects.JailSentence;
-import no.runsafe.runsafejail.objects.JailedPlayer;
+import no.runsafe.framework.api.IConfiguration;
+import no.runsafe.framework.api.IOutput;
+import no.runsafe.framework.api.ITimer;
+import no.runsafe.framework.api.event.plugin.IConfigurationChanged;
+import no.runsafe.framework.minecraft.RunsafeLocation;
+import no.runsafe.framework.minecraft.RunsafeServer;
+import no.runsafe.framework.minecraft.RunsafeWorld;
+import no.runsafe.framework.minecraft.player.RunsafePlayer;
 import no.runsafe.runsafejail.database.JailedPlayerDatabaseObject;
 import no.runsafe.runsafejail.database.JailedPlayersDatabase;
 import no.runsafe.runsafejail.database.JailsDatabase;
-import no.runsafe.runsafejail.exceptions.JailException;
 import no.runsafe.runsafejail.exceptions.JailPlayerException;
+import no.runsafe.runsafejail.objects.JailSentence;
+import no.runsafe.runsafejail.objects.JailedPlayer;
 import no.runsafe.runsafejail.workers.TetherWorker;
-import org.bukkit.entity.LivingEntity;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
@@ -49,7 +47,7 @@ public class JailHandler implements IConfigurationChanged
 	private void loadJailsFromDatabase()
 	{
 		this.jails = this.jailsDatabase.getJails();
-		this.console.outputDebugToConsole("Loaded %s jails from the database.", Level.INFO,  this.jails.size());
+		this.console.outputDebugToConsole("Loaded %s jails from the database.", Level.INFO, this.jails.size());
 	}
 
 	private void loadJailedPlayersFromDatabase()
@@ -66,10 +64,10 @@ public class JailHandler implements IConfigurationChanged
 			{
 				JailedPlayer jailedPlayer = (JailedPlayer) player;
 				jailedPlayer.setReturnLocation(new RunsafeLocation(
-						new RunsafeWorld(playerData.getReturnWorld()),
-						playerData.getReturnX(),
-						playerData.getReturnY(),
-						playerData.getReturnZ()
+					new RunsafeWorld(playerData.getReturnWorld()),
+					playerData.getReturnX(),
+					playerData.getReturnY(),
+					playerData.getReturnZ()
 				));
 
 				try
@@ -79,11 +77,11 @@ public class JailHandler implements IConfigurationChanged
 				catch (JailPlayerException e)
 				{
 					this.console.outputDebugToConsole(
-							"Failed to load jail sentence for %s in jail %s: %s",
-							Level.WARNING,
-							jailedPlayer.getName(),
-							playerData.getJailName(),
-							e.getMessage()
+						"Failed to load jail sentence for %s in jail %s: %s",
+						Level.WARNING,
+						jailedPlayer.getName(),
+						playerData.getJailName(),
+						e.getMessage()
 					);
 				}
 			}
@@ -142,14 +140,14 @@ public class JailHandler implements IConfigurationChanged
 					if (!jailedPlayer.hasReturnLocation()) jailedPlayer.setReturnLocation();
 
 					JailSentence jailSentence = new JailSentence(jailName, end, this.jailSentenceFactory.create(
-							jailedPlayer,
-							remainingTime,
-							false
+						jailedPlayer,
+						remainingTime,
+						false
 					));
 
 					this.jailedPlayers.put(playerName, jailSentence);
 					this.console.outputDebugToConsole(
-							"Jailing player %s for %s ticks", Level.INFO, playerName, remainingTime
+						"Jailing player %s for %s ticks", Level.INFO, playerName, remainingTime
 					);
 					this.jailedPlayersDatabase.addJailedPlayer(jailedPlayer, jailSentence);
 					jailedPlayer.teleport(this.getJailLocation(jailName));
@@ -177,7 +175,7 @@ public class JailHandler implements IConfigurationChanged
 		if (this.playerIsJailed(playerName))
 		{
 			ITimer jailTimer = this.jailedPlayers.get(playerName).getJailTimer();
-			jailTimer.ResetTicks(0L);
+			jailTimer.resetTicks(0L);
 		}
 		else
 		{
