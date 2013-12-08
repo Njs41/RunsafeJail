@@ -1,30 +1,30 @@
 package no.runsafe.runsafejail.objects;
 
+import no.runsafe.framework.api.ILocation;
+import no.runsafe.framework.api.player.IPlayer;
 import no.runsafe.framework.minecraft.RunsafeLocation;
-import no.runsafe.framework.minecraft.player.RunsafePlayer;
-import org.bukkit.entity.Player;
 
-public class JailedPlayer extends RunsafePlayer
+public class JailedPlayer
 {
-	public JailedPlayer(Player toWrap)
+	public JailedPlayer(IPlayer player)
 	{
-		super(toWrap);
+		this.player = player;
 	}
 
 	public void returnFromJail()
 	{
 		if (this.returnLocation != null)
-			this.teleport(this.returnLocation);
+			player.teleport(this.returnLocation);
 	}
 
-	public void setReturnLocation(RunsafeLocation returnLocation)
+	public void setReturnLocation(ILocation returnLocation)
 	{
 		this.returnLocation = returnLocation;
 	}
 
 	public void setReturnLocation()
 	{
-		this.returnLocation = this.getLocation();
+		this.returnLocation = player.getLocation();
 	}
 
 	public boolean hasReturnLocation()
@@ -32,10 +32,21 @@ public class JailedPlayer extends RunsafePlayer
 		return this.returnLocation != null;
 	}
 
-	public RunsafeLocation getReturnLocation()
+	public ILocation getReturnLocation()
 	{
 		return this.returnLocation;
 	}
 
-	RunsafeLocation returnLocation;
+	public String getName()
+	{
+		return player.getName();
+	}
+
+	public void teleport(ILocation jailLocation)
+	{
+		player.teleport(jailLocation);
+	}
+
+	private ILocation returnLocation;
+	private final IPlayer player;
 }

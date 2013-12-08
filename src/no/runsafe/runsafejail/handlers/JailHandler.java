@@ -1,13 +1,9 @@
 package no.runsafe.runsafejail.handlers;
 
-import no.runsafe.framework.api.IConfiguration;
-import no.runsafe.framework.api.IOutput;
-import no.runsafe.framework.api.IServer;
-import no.runsafe.framework.api.ITimer;
+import no.runsafe.framework.api.*;
 import no.runsafe.framework.api.event.plugin.IConfigurationChanged;
 import no.runsafe.framework.api.player.IPlayer;
 import no.runsafe.framework.minecraft.RunsafeLocation;
-import no.runsafe.framework.minecraft.RunsafeWorld;
 import no.runsafe.framework.minecraft.player.RunsafePlayer;
 import no.runsafe.runsafejail.database.JailedPlayerDatabaseObject;
 import no.runsafe.runsafejail.database.JailedPlayersDatabase;
@@ -25,7 +21,7 @@ import java.util.logging.Level;
 
 public class JailHandler implements IConfigurationChanged
 {
-	public JailHandler(JailsDatabase jailsDatabase, JailedPlayersDatabase jailedPlayersDatabase, IOutput console, JailSentenceFactory jailSentenceFactory, TetherWorker tetherWorker, IServer server)
+	public JailHandler(JailsDatabase jailsDatabase, JailedPlayersDatabase jailedPlayersDatabase, IDebug console, JailSentenceFactory jailSentenceFactory, TetherWorker tetherWorker, IServer server)
 	{
 		this.jailsDatabase = jailsDatabase;
 		this.console = console;
@@ -49,7 +45,7 @@ public class JailHandler implements IConfigurationChanged
 	private void loadJailsFromDatabase()
 	{
 		this.jails = this.jailsDatabase.getJails();
-		this.console.outputDebugToConsole("Loaded %s jails from the database.", Level.INFO, this.jails.size());
+		this.console.logInformation("Loaded %s jails from the database.", this.jails.size());
 	}
 
 	private void loadJailedPlayersFromDatabase()
@@ -62,11 +58,11 @@ public class JailHandler implements IConfigurationChanged
 		{
 			IPlayer player = server.getPlayer(playerData.getPlayerName());
 
-			if (player != null)
+			if (playerData != null)
 			{
-				JailedPlayer jailedPlayer = (JailedPlayer) player;
+				JailedPlayer jailedPlayer = new JailedPlayer(player);
 				jailedPlayer.setReturnLocation(new RunsafeLocation(
-					new RunsafeWorld(playerData.getReturnWorld()),
+					server.getWorld(playerData.getReturnWorld()),
 					playerData.getReturnX(),
 					playerData.getReturnY(),
 					playerData.getReturnZ()
@@ -109,7 +105,7 @@ public class JailHandler implements IConfigurationChanged
 		return null;
 	}
 
-	public RunsafeLocation getPlayerJailLocation(String playerName)
+	public ILocation getPlayerJailLocation(String playerName)
 	{
 		String jailName = this.getPlayerJail(playerName);
 
@@ -126,49 +122,42 @@ public class JailHandler implements IConfigurationChanged
 				jailSentence.getJailTimer().stop();
 	}
 
-	public void jailPlayer(RunsafePlayer player, String jailName, DateTime end) throws JailPlayerException
+	public void jailPlayer(IPlayer player, String jailName, DateTime end) throws JailPlayerException
 	{
-		if (player != null)
-		{
-			if (this.jailExists(jailName))
-			{
-				String playerName = player.getName();
-				if (!this.playerIsJailed(playerName))
-				{
-					Duration duration = new Duration(DateTime.now(), end);
-					long remainingTime = duration.getStandardSeconds() * 20;
-
-					JailedPlayer jailedPlayer = new JailedPlayer(player.getRawPlayer());
-					if (!jailedPlayer.hasReturnLocation()) jailedPlayer.setReturnLocation();
-
-					JailSentence jailSentence = new JailSentence(jailName, end, this.jailSentenceFactory.create(
-						jailedPlayer,
-						remainingTime,
-						false
-					));
-
-					this.jailedPlayers.put(playerName, jailSentence);
-					this.console.outputDebugToConsole(
-						"Jailing player %s for %s ticks", Level.INFO, playerName, remainingTime
-					);
-					this.jailedPlayersDatabase.addJailedPlayer(jailedPlayer, jailSentence);
-					jailedPlayer.teleport(this.getJailLocation(jailName));
-					this.tetherWorker.Push(jailedPlayer.getName(), null);
-				}
-				else
-				{
-					throw new JailPlayerException("That player is already in jail.");
-				}
-			}
-			else
-			{
-				throw new JailPlayerException("The specified jail does not exist.");
-			}
-		}
-		else
-		{
+		if (player == null)
 			throw new JailPlayerException("The specified player does not exist.");
-		}
+
+		jailPlayer(new JailedPlayer(player), jailName, end);
+	}
+
+	public void jailPlayer(JailedPlayer player, String jailName, DateTime end) throws JailPlayerException
+	{
+		if (player == null)
+			throw new JailPlayerException("The specified player does not exist.");
+		if (!this.jailExists(jailName))
+			throw new JailPlayerException("The specified jail does not exist.");
+		String playerName = player.getName();
+		if (this.playerIsJailed(playerName))
+			throw new JailPlayerException("That player is already in jail.");
+
+		Duration duration = new Duration(DateTime.now(), end);
+		long remainingTime = duration.getStandardSeconds() * 20;
+
+		if (!player.hasReturnLocation()) player.setReturnLocation();
+
+		JailSentence jailSentence = new JailSentence(jailName, end, this.jailSentenceFactory.create(
+			player,
+			remainingTime,
+			false
+		));
+
+		this.jailedPlayers.put(playerName, jailSentence);
+		this.console.debugFine(
+			"Jailing player %s for %s ticks", playerName, remainingTime
+		);
+		this.jailedPlayersDatabase.addJailedPlayer(player, jailSentence);
+		player.teleport(this.getJailLocation(jailName));
+		this.tetherWorker.Push(player.getName(), null);
 	}
 
 	public void unjailPlayer(RunsafePlayer player) throws JailPlayerException
@@ -194,7 +183,7 @@ public class JailHandler implements IConfigurationChanged
 		}
 	}
 
-	public RunsafeLocation getJailLocation(String jailName)
+	public ILocation getJailLocation(String jailName)
 	{
 		if (this.jailExists(jailName))
 			return this.jails.get(jailName);
@@ -207,14 +196,14 @@ public class JailHandler implements IConfigurationChanged
 		return this.jailTether;
 	}
 
-	private HashMap<String, RunsafeLocation> jails;
+	private HashMap<String, ILocation> jails;
 	private HashMap<String, JailSentence> jailedPlayers;
 
 	private JailsDatabase jailsDatabase;
 	private JailedPlayersDatabase jailedPlayersDatabase;
 	private JailSentenceFactory jailSentenceFactory;
 
-	private IOutput console;
+	private IDebug console;
 
 	private int jailTether = 20;
 	private TetherWorker tetherWorker;

@@ -1,10 +1,10 @@
 package no.runsafe.runsafejail.database;
 
+import no.runsafe.framework.api.ILocation;
 import no.runsafe.framework.api.IOutput;
 import no.runsafe.framework.api.database.IDatabase;
 import no.runsafe.framework.api.database.IRow;
 import no.runsafe.framework.api.database.Repository;
-import no.runsafe.framework.minecraft.RunsafeLocation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,9 +43,9 @@ public class JailsDatabase extends Repository
 		return queries;
 	}
 
-	public HashMap<String, RunsafeLocation> getJails()
+	public HashMap<String, ILocation> getJails()
 	{
-		HashMap<String, RunsafeLocation> jails = new HashMap<String, RunsafeLocation>();
+		HashMap<String, ILocation> jails = new HashMap<String, ILocation>();
 		for (IRow jail : database.Query("SELECT ID, world, x, y, z FROM jails"))
 			jails.put(
 				jail.String("ID"),

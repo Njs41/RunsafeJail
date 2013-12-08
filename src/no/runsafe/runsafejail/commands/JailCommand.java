@@ -3,7 +3,9 @@ package no.runsafe.runsafejail.commands;
 import no.runsafe.framework.api.IServer;
 import no.runsafe.framework.api.command.ExecutableCommand;
 import no.runsafe.framework.api.command.ICommandExecutor;
-import no.runsafe.framework.minecraft.player.RunsafePlayer;
+import no.runsafe.framework.api.command.argument.PlayerArgument;
+import no.runsafe.framework.api.command.argument.RequiredArgument;
+import no.runsafe.framework.api.player.IPlayer;
 import no.runsafe.runsafejail.exceptions.JailPlayerException;
 import no.runsafe.runsafejail.handlers.JailHandler;
 import org.joda.time.DateTime;
@@ -11,13 +13,13 @@ import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class JailCommand extends ExecutableCommand
 {
 	public JailCommand(JailHandler jailHandler, IServer server)
 	{
-		super("jail", "Jail a player in the specified jail", "runsafe.jail.<jail>", "player", "jail", "time");
+		super("jail", "Jail a player in the specified jail", "runsafe.jail.<jail>", new PlayerArgument(), new RequiredArgument("jail"), new RequiredArgument("time"));
 		this.jailHandler = jailHandler;
 		this.server = server;
 		this.timeParser = new PeriodFormatterBuilder()
@@ -31,9 +33,9 @@ public class JailCommand extends ExecutableCommand
 	}
 
 	@Override
-	public String OnExecute(ICommandExecutor executor, HashMap<String, String> parameters, String[] arguments)
+	public String OnExecute(ICommandExecutor executor, Map<String, String> parameters)
 	{
-		RunsafePlayer target = server.getPlayer(parameters.get("player"));
+		IPlayer target = server.getPlayer(parameters.get("player"));
 
 		try
 		{
@@ -45,12 +47,6 @@ public class JailCommand extends ExecutableCommand
 		{
 			return String.format("&c%s", e.getMessage());
 		}
-	}
-
-	@Override
-	public String OnExecute(ICommandExecutor executor, HashMap<String, String> parameters)
-	{
-		return null;
 	}
 
 	private PeriodFormatter timeParser;

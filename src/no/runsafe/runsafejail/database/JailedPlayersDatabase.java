@@ -2,10 +2,10 @@ package no.runsafe.runsafejail.database;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import no.runsafe.framework.api.ILocation;
 import no.runsafe.framework.api.database.IDatabase;
 import no.runsafe.framework.api.database.IRow;
 import no.runsafe.framework.api.database.Repository;
-import no.runsafe.framework.minecraft.RunsafeLocation;
 import no.runsafe.runsafejail.objects.JailSentence;
 import no.runsafe.runsafejail.objects.JailedPlayer;
 
@@ -76,7 +76,7 @@ public class JailedPlayersDatabase extends Repository
 
 	public void addJailedPlayer(JailedPlayer player, JailSentence jailSentence)
 	{
-		RunsafeLocation returnLocation = player.getReturnLocation();
+		ILocation returnLocation = player.getReturnLocation();
 		database.Execute(
 			"INSERT INTO jailed_players (" +
 				"playerName," +

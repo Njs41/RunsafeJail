@@ -1,15 +1,14 @@
 package no.runsafe.runsafejail.workers;
 
+import no.runsafe.framework.api.ILocation;
 import no.runsafe.framework.api.IScheduler;
 import no.runsafe.framework.api.IServer;
 import no.runsafe.framework.api.event.player.IPlayerLoginEvent;
 import no.runsafe.framework.api.event.player.IPlayerMove;
 import no.runsafe.framework.api.event.player.IPlayerTeleportEvent;
 import no.runsafe.framework.api.player.IPlayer;
-import no.runsafe.framework.minecraft.RunsafeLocation;
 import no.runsafe.framework.minecraft.event.player.RunsafePlayerLoginEvent;
 import no.runsafe.framework.minecraft.event.player.RunsafePlayerTeleportEvent;
-import no.runsafe.framework.minecraft.player.RunsafePlayer;
 import no.runsafe.framework.timer.ForegroundWorker;
 import no.runsafe.runsafejail.handlers.JailHandler;
 
@@ -30,7 +29,7 @@ public class TetherWorker extends ForegroundWorker<String, Object> implements IP
 	public void process(String playerName, Object object)
 	{
 		IPlayer player = server.getPlayer(playerName);
-		RunsafeLocation jailLocation = this.jailHandler.getPlayerJailLocation(player.getName());
+		ILocation jailLocation = this.jailHandler.getPlayerJailLocation(player.getName());
 
 		if (jailLocation.distance(player.getLocation()) > this.jailHandler.getJailTether())
 			player.teleport(jailLocation);
@@ -43,7 +42,7 @@ public class TetherWorker extends ForegroundWorker<String, Object> implements IP
 	}
 
 	@Override
-	public boolean OnPlayerMove(RunsafePlayer player, RunsafeLocation from, RunsafeLocation to)
+	public boolean OnPlayerMove(IPlayer player, ILocation from, ILocation to)
 	{
 		this.Push(player.getName(), null);
 		return true;
