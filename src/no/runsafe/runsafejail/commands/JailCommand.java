@@ -1,8 +1,8 @@
 package no.runsafe.runsafejail.commands;
 
+import no.runsafe.framework.api.IServer;
 import no.runsafe.framework.api.command.ExecutableCommand;
 import no.runsafe.framework.api.command.ICommandExecutor;
-import no.runsafe.framework.minecraft.RunsafeServer;
 import no.runsafe.framework.minecraft.player.RunsafePlayer;
 import no.runsafe.runsafejail.exceptions.JailPlayerException;
 import no.runsafe.runsafejail.handlers.JailHandler;
@@ -15,10 +15,11 @@ import java.util.HashMap;
 
 public class JailCommand extends ExecutableCommand
 {
-	public JailCommand(JailHandler jailHandler)
+	public JailCommand(JailHandler jailHandler, IServer server)
 	{
 		super("jail", "Jail a player in the specified jail", "runsafe.jail.<jail>", "player", "jail", "time");
 		this.jailHandler = jailHandler;
+		this.server = server;
 		this.timeParser = new PeriodFormatterBuilder()
 			.printZeroRarelyFirst().appendYears().appendSuffix("y", "years")
 			.printZeroRarelyFirst().appendWeeks().appendSuffix("w", "weeks")
@@ -32,7 +33,7 @@ public class JailCommand extends ExecutableCommand
 	@Override
 	public String OnExecute(ICommandExecutor executor, HashMap<String, String> parameters, String[] arguments)
 	{
-		RunsafePlayer target = RunsafeServer.Instance.getPlayer(parameters.get("player"));
+		RunsafePlayer target = server.getPlayer(parameters.get("player"));
 
 		try
 		{
@@ -54,4 +55,5 @@ public class JailCommand extends ExecutableCommand
 
 	private PeriodFormatter timeParser;
 	private JailHandler jailHandler;
+	private final IServer server;
 }

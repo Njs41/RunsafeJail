@@ -2,10 +2,11 @@ package no.runsafe.runsafejail.handlers;
 
 import no.runsafe.framework.api.IConfiguration;
 import no.runsafe.framework.api.IOutput;
+import no.runsafe.framework.api.IServer;
 import no.runsafe.framework.api.ITimer;
 import no.runsafe.framework.api.event.plugin.IConfigurationChanged;
+import no.runsafe.framework.api.player.IPlayer;
 import no.runsafe.framework.minecraft.RunsafeLocation;
-import no.runsafe.framework.minecraft.RunsafeServer;
 import no.runsafe.framework.minecraft.RunsafeWorld;
 import no.runsafe.framework.minecraft.player.RunsafePlayer;
 import no.runsafe.runsafejail.database.JailedPlayerDatabaseObject;
@@ -24,12 +25,13 @@ import java.util.logging.Level;
 
 public class JailHandler implements IConfigurationChanged
 {
-	public JailHandler(JailsDatabase jailsDatabase, JailedPlayersDatabase jailedPlayersDatabase, IOutput console, JailSentenceFactory jailSentenceFactory, TetherWorker tetherWorker)
+	public JailHandler(JailsDatabase jailsDatabase, JailedPlayersDatabase jailedPlayersDatabase, IOutput console, JailSentenceFactory jailSentenceFactory, TetherWorker tetherWorker, IServer server)
 	{
 		this.jailsDatabase = jailsDatabase;
 		this.console = console;
 		this.jailedPlayersDatabase = jailedPlayersDatabase;
 		this.jailSentenceFactory = jailSentenceFactory;
+		this.server = server;
 		this.jailSentenceFactory.setJailHandler(this);
 		this.tetherWorker = tetherWorker;
 		this.tetherWorker.setJailHandler(this);
@@ -58,7 +60,7 @@ public class JailHandler implements IConfigurationChanged
 
 		for (JailedPlayerDatabaseObject playerData : jailedPlayers)
 		{
-			RunsafePlayer player = RunsafeServer.Instance.getPlayer(playerData.getPlayerName());
+			IPlayer player = server.getPlayer(playerData.getPlayerName());
 
 			if (player != null)
 			{
@@ -216,4 +218,5 @@ public class JailHandler implements IConfigurationChanged
 
 	private int jailTether = 20;
 	private TetherWorker tetherWorker;
+	private final IServer server;
 }

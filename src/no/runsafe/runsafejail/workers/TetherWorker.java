@@ -1,11 +1,12 @@
 package no.runsafe.runsafejail.workers;
 
 import no.runsafe.framework.api.IScheduler;
+import no.runsafe.framework.api.IServer;
 import no.runsafe.framework.api.event.player.IPlayerLoginEvent;
 import no.runsafe.framework.api.event.player.IPlayerMove;
 import no.runsafe.framework.api.event.player.IPlayerTeleportEvent;
+import no.runsafe.framework.api.player.IPlayer;
 import no.runsafe.framework.minecraft.RunsafeLocation;
-import no.runsafe.framework.minecraft.RunsafeServer;
 import no.runsafe.framework.minecraft.event.player.RunsafePlayerLoginEvent;
 import no.runsafe.framework.minecraft.event.player.RunsafePlayerTeleportEvent;
 import no.runsafe.framework.minecraft.player.RunsafePlayer;
@@ -14,9 +15,10 @@ import no.runsafe.runsafejail.handlers.JailHandler;
 
 public class TetherWorker extends ForegroundWorker<String, Object> implements IPlayerMove, IPlayerTeleportEvent, IPlayerLoginEvent
 {
-	public TetherWorker(IScheduler scheduler)
+	public TetherWorker(IScheduler scheduler, IServer server)
 	{
 		super(scheduler);
+		this.server = server;
 	}
 
 	public void setJailHandler(JailHandler jailHandler)
@@ -27,7 +29,7 @@ public class TetherWorker extends ForegroundWorker<String, Object> implements IP
 	@Override
 	public void process(String playerName, Object object)
 	{
-		RunsafePlayer player = RunsafeServer.Instance.getPlayer(playerName);
+		IPlayer player = server.getPlayer(playerName);
 		RunsafeLocation jailLocation = this.jailHandler.getPlayerJailLocation(player.getName());
 
 		if (jailLocation.distance(player.getLocation()) > this.jailHandler.getJailTether())
@@ -54,4 +56,5 @@ public class TetherWorker extends ForegroundWorker<String, Object> implements IP
 	}
 
 	private JailHandler jailHandler;
+	private final IServer server;
 }
