@@ -1,7 +1,12 @@
 package no.runsafe.runsafejail.handlers;
 
-import no.runsafe.framework.api.*;
+import no.runsafe.framework.api.IConfiguration;
+import no.runsafe.framework.api.ILocation;
+import no.runsafe.framework.api.IServer;
+import no.runsafe.framework.api.ITimer;
 import no.runsafe.framework.api.event.plugin.IConfigurationChanged;
+import no.runsafe.framework.api.log.IConsole;
+import no.runsafe.framework.api.log.IDebug;
 import no.runsafe.framework.api.player.IPlayer;
 import no.runsafe.framework.minecraft.RunsafeLocation;
 import no.runsafe.framework.minecraft.player.RunsafePlayer;
@@ -21,12 +26,13 @@ import java.util.logging.Level;
 
 public class JailHandler implements IConfigurationChanged
 {
-	public JailHandler(JailsDatabase jailsDatabase, JailedPlayersDatabase jailedPlayersDatabase, IDebug console, JailSentenceFactory jailSentenceFactory, TetherWorker tetherWorker, IServer server)
+	public JailHandler(JailsDatabase jailsDatabase, JailedPlayersDatabase jailedPlayersDatabase, IDebug console, JailSentenceFactory jailSentenceFactory, IConsole console1, TetherWorker tetherWorker, IServer server)
 	{
 		this.jailsDatabase = jailsDatabase;
-		this.console = console;
+		this.debugger = console;
 		this.jailedPlayersDatabase = jailedPlayersDatabase;
 		this.jailSentenceFactory = jailSentenceFactory;
+		this.console = console1;
 		this.server = server;
 		this.jailSentenceFactory.setJailHandler(this);
 		this.tetherWorker = tetherWorker;
@@ -74,7 +80,7 @@ public class JailHandler implements IConfigurationChanged
 				}
 				catch (JailPlayerException e)
 				{
-					this.console.outputDebugToConsole(
+					this.debugger.outputDebugToConsole(
 						"Failed to load jail sentence for %s in jail %s: %s",
 						Level.WARNING,
 						jailedPlayer.getName(),
@@ -84,7 +90,7 @@ public class JailHandler implements IConfigurationChanged
 				}
 			}
 		}
-		this.console.outputDebugToConsole("Loaded %s jail sentences from the database.", Level.INFO, this.jailedPlayers.size());
+		this.debugger.outputDebugToConsole("Loaded %s jail sentences from the database.", Level.INFO, this.jailedPlayers.size());
 	}
 
 	private boolean jailExists(String jailName)
@@ -152,7 +158,7 @@ public class JailHandler implements IConfigurationChanged
 		));
 
 		this.jailedPlayers.put(playerName, jailSentence);
-		this.console.debugFine(
+		this.debugger.debugFine(
 			"Jailing player %s for %s ticks", playerName, remainingTime
 		);
 		this.jailedPlayersDatabase.addJailedPlayer(player, jailSentence);
@@ -203,7 +209,8 @@ public class JailHandler implements IConfigurationChanged
 	private JailedPlayersDatabase jailedPlayersDatabase;
 	private JailSentenceFactory jailSentenceFactory;
 
-	private IDebug console;
+	private IDebug debugger;
+	private IConsole console;
 
 	private int jailTether = 20;
 	private TetherWorker tetherWorker;
