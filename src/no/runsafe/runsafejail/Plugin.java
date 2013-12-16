@@ -13,7 +13,7 @@ import no.runsafe.runsafejail.handlers.JailSentenceFactory;
 public class Plugin extends RunsafeConfigurablePlugin
 {
 	@Override
-	protected void PluginSetup()
+	protected void pluginSetup()
 	{
 		// TODO: Un-jail command
 		// TODO: in-game jail creator
