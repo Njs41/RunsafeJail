@@ -2,7 +2,6 @@ package no.runsafe.runsafejail.objects;
 
 import no.runsafe.framework.api.ILocation;
 import no.runsafe.framework.api.player.IPlayer;
-import no.runsafe.framework.minecraft.RunsafeLocation;
 
 public class JailedPlayer
 {
