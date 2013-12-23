@@ -8,7 +8,6 @@ import no.runsafe.framework.api.event.plugin.IConfigurationChanged;
 import no.runsafe.framework.api.log.IConsole;
 import no.runsafe.framework.api.log.IDebug;
 import no.runsafe.framework.api.player.IPlayer;
-import no.runsafe.framework.minecraft.RunsafeLocation;
 import no.runsafe.framework.minecraft.player.RunsafePlayer;
 import no.runsafe.runsafejail.database.JailedPlayerDatabaseObject;
 import no.runsafe.runsafejail.database.JailedPlayersDatabase;
@@ -67,12 +66,13 @@ public class JailHandler implements IConfigurationChanged
 			if (playerData != null)
 			{
 				JailedPlayer jailedPlayer = new JailedPlayer(player);
-				jailedPlayer.setReturnLocation(new RunsafeLocation(
-					server.getWorld(playerData.getReturnWorld()),
-					playerData.getReturnX(),
-					playerData.getReturnY(),
-					playerData.getReturnZ()
-				));
+				jailedPlayer.setReturnLocation(
+					server.getWorld(playerData.getReturnWorld()).getLocation(
+						playerData.getReturnX(),
+						playerData.getReturnY(),
+						playerData.getReturnZ()
+					)
+				);
 
 				try
 				{
