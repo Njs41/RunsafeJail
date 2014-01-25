@@ -2,19 +2,17 @@ package no.runsafe.runsafejail.database;
 
 import no.runsafe.framework.api.ILocation;
 import no.runsafe.framework.api.IOutput;
-import no.runsafe.framework.api.database.IDatabase;
 import no.runsafe.framework.api.database.IRow;
+import no.runsafe.framework.api.database.ISchemaUpdate;
 import no.runsafe.framework.api.database.Repository;
+import no.runsafe.framework.api.database.SchemaUpdate;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class JailsDatabase extends Repository
 {
-	public JailsDatabase(IDatabase database, IOutput console)
+	public JailsDatabase(IOutput console)
 	{
-		this.database = database;
 		this.console = console;
 	}
 
@@ -25,11 +23,10 @@ public class JailsDatabase extends Repository
 	}
 
 	@Override
-	public HashMap<Integer, List<String>> getSchemaUpdateQueries()
+	public ISchemaUpdate getSchemaUpdateQueries()
 	{
-		HashMap<Integer, List<String>> queries = new HashMap<Integer, List<String>>();
-		ArrayList<String> sql = new ArrayList<String>();
-		sql.add(
+		ISchemaUpdate schema = new SchemaUpdate();
+		schema.addQueries(
 			"CREATE TABLE `jails` (" +
 				"`ID` VARCHAR(30) NOT NULL," +
 				"`x` DOUBLE NOT NULL," +
@@ -39,14 +36,13 @@ public class JailsDatabase extends Repository
 				"PRIMARY KEY (`ID`)" +
 				")"
 		);
-		queries.put(1, sql);
-		return queries;
+		return schema;
 	}
 
 	public HashMap<String, ILocation> getJails()
 	{
 		HashMap<String, ILocation> jails = new HashMap<String, ILocation>();
-		for (IRow jail : database.Query("SELECT ID, world, x, y, z FROM jails"))
+		for (IRow jail : database.query("SELECT ID, world, x, y, z FROM jails"))
 			jails.put(
 				jail.String("ID"),
 				jail.Location()
@@ -54,6 +50,5 @@ public class JailsDatabase extends Repository
 		return jails;
 	}
 
-	private IDatabase database;
 	private IOutput console;
 }
